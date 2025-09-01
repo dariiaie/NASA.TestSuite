@@ -1,0 +1,54 @@
+name: CI
+on: [push]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Add dotnet tools to PATH
+        run: echo "${HOME}/.dotnet/tools" >> $GITHUB_PATH
+
+      # Restore packages
+      - name: Restore NuGet packages
+        run: dotnet restore
+
+      # Build project (Release for CI)
+      - name: Build project
+        run: dotnet build --configuration Release
+
+      # Install Playwright CLI
+      - name: Install Playwright CLI
+        run: dotnet tool install --global Microsoft.Playwright.CLI
+
+      # Install Playwright browsers
+      - name: Install Playwright browsers
+        run: playwright install --with-deps
+
+      # Install SpecFlow LivingDoc CLI
+      - name: Install LivingDoc CLI
+        run: dotnet tool install --global SpecFlow.Plus.LivingDoc.CLI
+
+      # Run tests (API + UI) → generates execution JSONs
+      - name: Run Tests
+        run: dotnet test --configuration Release
+
+      - name: Generate LivingDoc API Report
+        run: livingdoc test-assembly NASA.Tests.API/bin/Release/net8.0/NASA.Tests.API.dll -t NASA.Tests.API/bin/Release/net8.0/TestExecution.json -o LivingDoc_API.html
+
+      - name: Generate LivingDoc UI Report
+        run: livingdoc test-assembly NASA.Tests.UI/bin/Release/net8.0/NASA.Tests.UI.dll -t NASA.Tests.UI/bin/Release/net8.0/TestExecution.json -o LivingDoc_UI.html
+
+      # Upload LivingDoc Reports
+      - name: Upload LivingDoc Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: livingdoc-reports
+          path: |
+            LivingDoc_API.html
+            LivingDoc_UI.html
