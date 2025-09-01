@@ -47,7 +47,7 @@ NASA.TestSuite
 
 🚀 Getting Started
 ## Clone the Repo
-git clone https://github.com/your-username/NASA.TestSuite.git <br>
+git clone https://github.com/dariiaie/NASA.TestSuite.git <br>
 cd NASA.TestSuite
 
 ## Install Prerequisites
