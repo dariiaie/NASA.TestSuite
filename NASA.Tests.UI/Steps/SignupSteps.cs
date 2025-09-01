@@ -17,7 +17,7 @@ namespace NASA.Tests.UI.Steps
             var playwright = await Microsoft.Playwright.Playwright.CreateAsync();
             _browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
             {
-                Headless = false,
+                Headless = true,
                 SlowMo = 50
             });
             _context = await _browser.NewContextAsync();
